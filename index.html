@@ -265,14 +265,27 @@
 <script>
 const API_URL = "/api/chat";
 let denticaSessionId = null;
-function denticaToggle() { document.getElementById('denticaChat').classList.toggle('open'); document.getElementById('denticaToggle').classList.toggle('active'); }
+let denticaPending = false;
+function denticaToggle() { 
+    const chat = document.getElementById('denticaChat');
+    const btn = document.getElementById('denticaToggle');
+    chat.classList.toggle('open'); 
+    btn.classList.toggle('active');
+    if (chat.classList.contains('open') && !denticaSessionId) {
+        denticaAddMsg('🦷 Здравствуйте! Я консультант стоматологии Dentica. Чем могу помочь?', 'bot');
+    }
+}
 function denticaSend() {
+    if (denticaPending) return;
     const input = document.getElementById('denticaInput');
     const msg = input.value.trim(); if (!msg) return;
     denticaAddMsg(msg, 'user'); input.value = ''; denticaAddMsg('...', 'typing');
-    fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: denticaSessionId, message: msg }) })
-    .then(r => r.json()).then(data => { denticaSessionId = data.session_id; const t = document.querySelector('.typing'); if(t) t.remove(); denticaAddMsg(data.answer || '⚠ '+data.error, 'bot'); })
-    .catch(() => { const t = document.querySelector('.typing'); if(t) t.remove(); denticaAddMsg('⚠ Сервер временно недоступен. Оставьте телефон — мы перезвоним!', 'bot'); });
+    denticaPending = true;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: denticaSessionId, message: msg }), signal: controller.signal })
+    .then(r => r.json()).then(data => { clearTimeout(timeout); denticaSessionId = data.session_id; const t = document.querySelector('.typing'); if(t) t.remove(); denticaAddMsg(data.answer || '⚠ '+data.error, 'bot'); denticaPending = false; })
+    .catch(() => { clearTimeout(timeout); const t = document.querySelector('.typing'); if(t) t.remove(); denticaAddMsg('⏳ Сервер обрабатывает запрос. Попробуйте через минуту или оставьте телефон в сообщении — мы перезвоним!', 'bot'); denticaPending = false; });
 }
 function denticaAddMsg(text, type) { const div = document.createElement('div'); div.className = 'dentica-msg ' + type; div.textContent = text; document.getElementById('denticaMessages').appendChild(div); div.scrollIntoView({ behavior: 'smooth', block: 'end' }); }
 </script>
