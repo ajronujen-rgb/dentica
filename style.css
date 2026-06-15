@@ -14,11 +14,22 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     line-height: 1.6;
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* Навигация */
@@ -39,6 +50,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
 }
 
 .logo {
@@ -73,6 +85,7 @@ body {
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s;
+    white-space: nowrap;
 }
 
 .cta-button:hover {
@@ -108,6 +121,7 @@ body {
 
 .hero-features {
     display: flex;
+    flex-wrap: wrap;
     gap: 2rem;
     margin-bottom: 2.5rem;
 }
@@ -396,6 +410,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
 }
 
 .footer-logo {
@@ -406,6 +422,7 @@ body {
 .footer-links {
     display: flex;
     gap: 2rem;
+    flex-wrap: wrap;
 }
 
 .footer-links a {
@@ -417,12 +434,34 @@ body {
     opacity: 0.7;
 }
 
-/* Responsive */
+/* ========== TABLET ========== */
 @media (max-width: 1024px) {
-    .hero,
-    .about-grid,
+    .hero {
+        grid-template-columns: 1fr;
+        padding-top: 7rem;
+        min-height: auto;
+    }
+    
+    .hero-image {
+        order: -1;
+    }
+    
+    .hero-image img {
+        height: 400px;
+    }
+    
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .about-image img {
+        height: 350px;
+    }
+    
     .contact-grid {
         grid-template-columns: 1fr;
+        gap: 2rem;
     }
     
     .team-grid {
@@ -430,20 +469,184 @@ body {
     }
     
     .services-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
+/* ========== MOBILE ========== */
 @media (max-width: 768px) {
-    .hero-content h1 {
-        font-size: 2.5rem;
+    .nav {
+        padding: 0.75rem 1rem;
     }
     
-    .team-grid {
-        grid-template-columns: 1fr;
+    .logo {
+        font-size: 1.25rem;
     }
     
     .nav-links {
         display: none;
+    }
+    
+    .cta-button {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Hero */
+    .hero {
+        padding: 6rem 1rem 2rem;
+        gap: 2rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-features {
+        gap: 0.75rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .feature {
+        font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+    }
+    
+    .hero-image img {
+        height: 280px;
+    }
+    
+    /* About */
+    .about {
+        padding: 3rem 1rem;
+    }
+    
+    .about-content h2 {
+        font-size: 1.75rem;
+    }
+    
+    .about-lead {
+        font-size: 1.05rem;
+    }
+    
+    .about-image img {
+        height: 250px;
+    }
+    
+    .about-stats {
+        gap: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.75rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    /* Team */
+    .team {
+        padding: 3rem 1rem;
+    }
+    
+    .team h2 {
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+    }
+    
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .team-card img {
+        height: 250px;
+    }
+    
+    /* Services */
+    .services {
+        padding: 3rem 1rem;
+    }
+    
+    .services h2 {
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+    }
+    
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .service-card {
+        padding: 1.5rem;
+    }
+    
+    .service-card img {
+        height: 200px;
+    }
+    
+    /* Contact */
+    .contact {
+        padding: 3rem 1rem;
+    }
+    
+    .contact-info h2 {
+        font-size: 1.75rem;
+    }
+    
+    .contact-form {
+        padding: 1.5rem;
+    }
+    
+    .contact-form h3 {
+        font-size: 1.25rem;
+    }
+    
+    /* Footer */
+    .footer {
+        padding: 2rem 1rem;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-links {
+        justify-content: center;
+        gap: 1.5rem;
+    }
+}
+
+/* ========== SMALL PHONES ========== */
+@media (max-width: 420px) {
+    .hero-content h1 {
+        font-size: 1.75rem;
+    }
+    
+    .hero-features {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .about-stats {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .stat {
+        padding: 0.5rem 0;
     }
 }
