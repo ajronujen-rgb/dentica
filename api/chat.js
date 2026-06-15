@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('http://72.56.241.48/chat', {
+    const response = await fetch('http://72.56.241.48:8080/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id, message }),
