@@ -269,12 +269,23 @@ let denticaPending = false;
 function denticaToggle() { 
     const chat = document.getElementById('denticaChat');
     const btn = document.getElementById('denticaToggle');
+    const isOpen = chat.classList.contains('open');
     chat.classList.toggle('open'); 
     btn.classList.toggle('active');
-    if (chat.classList.contains('open') && !denticaSessionId) {
+    if (!isOpen && !denticaSessionId) {
         denticaAddMsg('🦷 Здравствуйте! Я консультант стоматологии Dentica. Чем могу помочь?', 'bot');
     }
 }
+
+// Закрытие чата по клику вне виджета
+document.addEventListener('click', function(e) {
+    const chat = document.getElementById('denticaChat');
+    const btn = document.getElementById('denticaToggle');
+    if (!chat.classList.contains('open')) return;
+    if (chat.contains(e.target) || btn.contains(e.target)) return;
+    chat.classList.remove('open');
+    btn.classList.remove('active');
+});
 function denticaSend() {
     if (denticaPending) return;
     const input = document.getElementById('denticaInput');
