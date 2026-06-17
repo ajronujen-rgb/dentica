@@ -1,70 +1,47 @@
 /**
- * Edge Function — прокси для Triage Agent Dentica
- * Edge имеет таймаут 30с даже на Hobby плане
+ * API прокси для Triage Agent Dentica
+ * Vercel Serverless Function — HTTPS → HTTP к серверу
  */
-export const config = {
-  runtime: 'edge',
-};
-
-const BACKEND = 'http://72.56.241.48:8080';
-
-export default async function handler(req) {
+export default async function handler(req, res) {
   // CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    });
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { session_id, message } = req.body || {};
+
+  if (!message) {
+    return res.status(400).json({ error: 'Message required' });
   }
 
   try {
-    const body = await req.json();
-    const { session_id, message } = body || {};
-
-    if (!message) {
-      return new Response(JSON.stringify({ error: 'Message required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      });
-    }
-
-    const response = await fetch(`${BACKEND}/chat`, {
+    const response = await fetch('https://n8n.barrymore-bot.ru/webhook/dentica-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id, message }),
-      signal: AbortSignal.timeout(25000),
+      signal: AbortSignal.timeout(50000),
     });
 
     if (!response.ok) {
       const text = await response.text();
-      return new Response(JSON.stringify({ error: 'Agent error', detail: text }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      });
+      return res.status(502).json({ error: 'Agent error', detail: text });
     }
 
     const data = await response.json();
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    });
+    return res.status(200).json(data);
 
   } catch (err) {
-    const message = err.name === 'TimeoutError' ? 'Agent timeout' : err.message;
-    return new Response(JSON.stringify({ error: message }), {
-      status: 504,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    });
+    if (err.name === 'TimeoutError') {
+      return res.status(504).json({ error: 'Agent timeout' });
+    }
+    return res.status(500).json({ error: err.message });
   }
 }
